@@ -8,6 +8,7 @@ import os
 
 # List of images from test_images folder
 test_path = "test_images/"
+test_output_path="test_images_output/"
 list_test_im = os.listdir(test_path)
 
 #reading in an image
@@ -65,7 +66,7 @@ def region_of_interest(img, vertices):
     return masked_image
 
 
-def draw_lines(img, lines, color=[255, 0, 0], thickness=2):
+def draw_lines(img, lines, color=[255, 0, 0], thickness=10):
     """
     NOTE: this is the function you might want to use as a starting point once you want to
     average/extrapolate the line segments you detect to map out the full
@@ -142,25 +143,26 @@ def image_resize(img,height=540,width=960):
 cal_kernel=5
 cal_low_threshold=50
 cal_high_threshold=150
-cal_rho=2
+cal_rho=4
 cal_theta=np.pi/180
-cal_hough_threshold=15
-cal_min_line_length=40
-cal_max_line_gap=20
+cal_hough_threshold=10
+cal_min_line_length=8
+cal_max_line_gap=4
+cal_vertices=np.array( [[[420,330],[170,539],[905,539],[570,330]]], dtype=np.int32 )
 
 # Pipeline of images
-for file in list_test_im:
-    image_raw=mpimg.imread(test_path+file)
-    image_proc=np.copy(image_raw)
-    image_gray=grayscale(image_proc)
-    image_blur=gaussian_blur(image_gray,cal_kernel)
-    image_edges=canny(image_blur,cal_low_threshold,cal_high_threshold)
-    image_hough=hough_lines(image_edges,cal_rho,cal_theta,cal_hough_threshold,cal_min_line_length,cal_max_line_gap)
-    image_weighted=weighted_img(image_hough,image_proc)
-
-    #To be commented out
-    plt.imshow(image_weighted)
-    plt.show()
-    break
+def test_algo_images(list_test_im):
+    for i,file in enumerate(list_test_im):
+        image_raw=mpimg.imread(test_path+file)
+        image_proc=np.copy(image_raw)
+        image_gray=grayscale(image_proc)
+        image_blur=gaussian_blur(image_gray,cal_kernel)
+        image_edges=canny(image_blur,cal_low_threshold,cal_high_threshold)
+        image_region = region_of_interest(image_edges, cal_vertices)
+        image_hough=hough_lines(image_region,cal_rho,cal_theta,cal_hough_threshold,cal_min_line_length,cal_max_line_gap)
+        image_weighted=weighted_img(image_hough,image_proc)
+        #To be commented out
+        image_weighted_save = cv2.cvtColor(image_weighted, cv2.COLOR_BGR2RGB) # Change in format for saving
+        cv2.imwrite(test_output_path + file, image_weighted_save)
 
 
