@@ -114,7 +114,7 @@ def draw_lines(img, lines, color=[255, 0, 0], thickness=10):
                 slope=(y2-y1)/(x2-x1)
                 slope_val=True
             if slope_val is True:
-                if x1<=x_half and slope<0 and x2<=x_half:
+                if x1<x_half and slope<0 and x2<x_half:
                     x_left.append(x1)
                     y_left.append(y1)
                     x_left.append(x2)
@@ -141,10 +141,6 @@ def draw_lines(img, lines, color=[255, 0, 0], thickness=10):
     new_right_x2 =int((y_top - right_c) / right_slope)
     cv2.line(img, (new_right_x1, y_start), (new_right_x2, y_top), color, thickness)
     cv2.line(img,(new_left_x1,y_start),(new_left_x2,y_top),color,thickness)
-
-
-
-
 
 def hough_lines(img, rho, theta, threshold, min_line_len, max_line_gap):
     """
@@ -211,10 +207,7 @@ def filter_image(image):
     comb_mask=cv2.bitwise_or(mask_white,mask_yellow)
     final_image=cv2.bitwise_and(image,image,mask=comb_mask)
     return cv2.addWeighted(image,0.8,final_image,1.0,0.1)
-    
 
-
-#filter_image(image_white)
 # Pipeline of images
 def test_algo_images(list_test_im):
     for i,file in enumerate(list_test_im):
@@ -234,8 +227,6 @@ def test_algo_images(list_test_im):
         if cv2.waitKey(0) and 0xFF == ord('q'): # Wait to show image for 5 milliseconds and 'q' tap on keyboard to close and move to next
            cv2.destroyAllWindows()
 
-#test_algo_images(list_test_im)
-
 def process_image(image):
     #image_raw = (mpimg.imread(image)).astype('uint8')
     image_raw=image
@@ -249,23 +240,27 @@ def process_image(image):
                               cal_max_line_gap)
     image_weighted = weighted_img(image_hough, image_raw)
     return image_weighted
-white_output = 'test_videos_output/solidWhiteRight.mp4'
-## To speed up the testing process you may want to try your pipeline on a shorter subclip of the video
-## To do so add .subclip(start_second,end_second) to the end of the line below
-## Where start_second and end_second are integer values representing the start and end of the subclip
-## You may also uncomment the following line for a subclip of the first 5 seconds
-#clip1 = VideoFileClip("test_videos/solidWhiteRight.mp4").subclip(0,5)
-clip1 = VideoFileClip("test_videos/solidWhiteRight.mp4")
-white_clip = clip1.fl_image(process_image) #NOTE: this function expects color images!!
-#%time white_clip.write_videofile(white_output, audio=False)
-white_clip.write_videofile(white_output, audio=False)
+def main():
+    test_algo_images(list_test_im)
+    white_output = 'test_videos_output/solidWhiteRight.mp4'
+    ## To speed up the testing process you may want to try your pipeline on a shorter subclip of the video
+    ## To do so add .subclip(start_second,end_second) to the end of the line below
+    ## Where start_second and end_second are integer values representing the start and end of the subclip
+    ## You may also uncomment the following line for a subclip of the first 5 seconds
+    #clip1 = VideoFileClip("test_videos/solidWhiteRight.mp4").subclip(0,5)
+    clip1 = VideoFileClip("test_videos/solidWhiteRight.mp4")
+    white_clip = clip1.fl_image(process_image) #NOTE: this function expects color images!!
+    #%time white_clip.write_videofile(white_output, audio=False)
+    white_clip.write_videofile(white_output, audio=False)
 
-yellow_output = 'test_videos_output/solidYellowLeft.mp4'
-## To speed up the testing process you may want to try your pipeline on a shorter subclip of the video
-## To do so add .subclip(start_second,end_second) to the end of the line below
-## Where start_second and end_second are integer values representing the start and end of the subclip
-## You may also uncomment the following line for a subclip of the first 5 seconds
-##clip2 = VideoFileClip('test_videos/solidYellowLeft.mp4').subclip(0,5)
-clip2 = VideoFileClip('test_videos/solidYellowLeft.mp4')
-yellow_clip = clip2.fl_image(process_image)
-yellow_clip.write_videofile(yellow_output, audio=False)
+    yellow_output = 'test_videos_output/solidYellowLeft.mp4'
+    ## To speed up the testing process you may want to try your pipeline on a shorter subclip of the video
+    ## To do so add .subclip(start_second,end_second) to the end of the line below
+    ## Where start_second and end_second are integer values representing the start and end of the subclip
+    ## You may also uncomment the following line for a subclip of the first 5 seconds
+    ##clip2 = VideoFileClip('test_videos/solidYellowLeft.mp4').subclip(0,5)
+    clip2 = VideoFileClip('test_videos/solidYellowLeft.mp4')
+    yellow_clip = clip2.fl_image(process_image)
+    yellow_clip.write_videofile(yellow_output, audio=False)
+
+main()
